@@ -1,0 +1,4 @@
+openapi: 3.0.3
+info:
+  title: Jolt Demo System
+  description: to experiment with Jolt JSON Transformation Liberary
