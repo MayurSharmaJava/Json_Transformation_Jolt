@@ -13,11 +13,12 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class JoltSpec {
 
-	@Id
+	/*@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "spec_seq_generator")
 	@SequenceGenerator(name="spec_seq_generator", sequenceName = "JOLT_SPEC_SEQ")
-	private long id;
+	private long id;*/
 
+	@Id
 	@Column(name = "name")
 	private String name;
 

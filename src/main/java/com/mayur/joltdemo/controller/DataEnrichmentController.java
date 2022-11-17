@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -27,8 +24,8 @@ public class DataEnrichmentController {
 	@Autowired
 	private JoltSpecController joltSpecController;
 
-	@GetMapping("/{id}")
-	public String enrich(@PathVariable(value = "id") long id) {
+	@GetMapping
+	public String enrich(@RequestParam(value = "id") long id, @RequestParam(value = "formatName") String formatName) {
 
 		ResponseEntity<Map<String, Object>> responseEntity
 				= restTemplate.exchange("http://localhost/api/external/customerId/"+id,
@@ -36,7 +33,7 @@ public class DataEnrichmentController {
 		});
 
 		Object inputJson = responseEntity.getBody();
-		String spec = joltSpecController.getSpec("Dummy");
+		String spec = joltSpecController.getSpec(formatName);
 
 		List chainSpecJSON = JsonUtils.jsonToList(spec);
 		Chainr chainr = Chainr.fromSpec(chainSpecJSON);

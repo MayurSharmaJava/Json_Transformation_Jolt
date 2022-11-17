@@ -1,9 +1,14 @@
 package com.mayur.joltdemo.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.mayur.joltdemo.entity.JoltSpec;
+import com.mayur.joltdemo.exception.ResourceNotFoundException;
+import com.mayur.joltdemo.repository.JoltSpecRepository;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityManager;
 
 /**
  * This is Spec controller for Jolt
@@ -17,11 +22,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/spec/")
 public class JoltSpecController {
 
+	@Autowired
+	private JoltSpecRepository joltSpecRepository;
+
+	@Autowired
+	private EntityManager entityManager;
+
 	@GetMapping("/{name}")
 	public String getSpec(@PathVariable(value = "name") String name) {
-		/**
-		 * on the basis of Spec name get Spec from database
-		 */
-		return "[   {     \"operation\": \"shift\",     \"spec\": {       \"firstName\": \"name\"     }   } ]";
+
+		Session session = entityManager.unwrap(Session.class);
+
+		String hql = "FROM JoltSpec J WHERE J.name = :name";
+
+		Query<JoltSpec> query = session.createQuery(hql);
+		query.setParameter("name", name);
+		JoltSpec joltSpec = query.getSingleResult();
+
+		return joltSpec.getSpecJson();
+	}
+
+	@PostMapping
+	public JoltSpec addJoltSpec(@RequestParam ("name") String name,@RequestParam ("specJson") String specJson,@RequestParam ("comment") String comment) {
+		JoltSpec joltSpec = new JoltSpec();
+		joltSpec.setName(name);
+		joltSpec.setSpecJson(specJson);
+		joltSpec.setComments(comment);
+		return this.joltSpecRepository.save(joltSpec);
 	}
 }
